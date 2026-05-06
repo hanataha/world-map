@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Character Profile</title>
+    <!-- 1. SUPABASE LIBRARY -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root { --bg-color: #050a18; --card-bg: rgba(16, 25, 46, 0.7); --accent-blue: #00d4ff; --text-main: #e0e6ed; --text-dim: #94a3b8; --border-color: rgba(255, 255, 255, 0.08); }
+        body { background-color: var(--bg-color); color: var(--text-main); font-family: 'Inter', sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .profile-card { display: flex; width: 100%; max-width: 1000px; background: var(--card-bg); backdrop-filter: blur(12px); border: 1px solid var(--border-color); border-radius: 32px; overflow: hidden; min-height: 500px; }
+        .info-section { flex: 1; padding: 50px; display: flex; flex-direction: column; }
+        .image-section { width: 40%; min-width: 350px; position: relative; border-left: 1px solid var(--border-color); }
+        .character-img { width: 100%; height: 100%; object-fit: cover; }
+        .back-btn { position: fixed; top: 20px; left: 20px; color: var(--accent-blue); text-decoration: none; font-weight: bold; z-index: 10; }
+        .description-scroll { max-height: 350px; overflow-y: auto; margin: 20px 0; color: var(--text-dim); line-height: 1.8; }
+        .stats-footer { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: auto; }
+        .stat-box { background: rgba(255,255,255,0.03); padding: 15px; border-radius: 16px; border: 1px solid var(--border-color); text-align: center; }
+        h1 { background: linear-gradient(90deg, #fff, var(--accent-blue)); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0; font-size: 2.5rem; }
+        
+        /* Loading State */
+        .loader { display: flex; justify-content: center; align-items: center; width: 100%; color: var(--accent-blue); font-weight: bold; }
+    </style>
+</head>
+<body>
+    <a href="charlist.html" class="back-btn">← Back to Gallery</a>
+    
+    <div class="profile-card" id="profile-content">
+        <div class="loader">Accessing Archive Data...</div>
+    </div>
+
+    <script>
+        // 2. SUPABASE CONNECTION (Updated variable name)
+        const supabaseUrl = 'https://qamxewtxqpjnanfnukyf.supabase.co';
+        const supabaseKey = 'sb_publishable_P1xM99HgR3CHIeOn8VRrlw_4DwYmDeG'; 
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+        // 3. GET ID FROM URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const charId = urlParams.get('id');
+
+        async function loadProfile() {
+            if (!charId) {
+                document.getElementById('profile-content').innerHTML = "<div class='loader'>No ID provided.</div>";
+                return;
+            }
+
+            // 4. FETCH SPECIFIC CHARACTER (Updated to supabaseClient)
+            const { data: char, error } = await supabaseClient
+                .from('characters')
+                .select('*')
+                .eq('id', charId)
+                .single(); 
+
+            if (error || !char) {
+                console.error(error);
+                document.getElementById('profile-content').innerHTML = `
+                    <div class="info-section">
+                        <h1>Character Not Found</h1>
+                        <p>The neural link could not find this entry in the database.</p>
+                        <a href="charlist.html" style="color:var(--accent-blue)">Return to Gallery</a>
+                    </div>`;
+                return;
+            }
+
+            // 5. INJECT DATA
+            document.getElementById('profile-content').innerHTML = `
+                <div class="info-section">
+                    <div style="color:var(--accent-blue); text-transform:uppercase; letter-spacing:2px; font-weight:700;">${char.subtitle}</div>
+                    <h1>${char.name}</h1>
+                    <div class="description-scroll">${char.desc}</div>
+                    <div class="stats-footer">
+                        <div class="stat-box"><small style="color:var(--accent-blue)">ORIGIN</small><br>${char.s1}</div>
+                        <div class="stat-box"><small style="color:var(--accent-blue)">HOBBY</small><br>${char.s2}</div>
+                        <div class="stat-box"><small style="color:var(--accent-blue)">HOUSE</small><br>${char.s3}</div>
+                    </div>
+                </div>
+                <div class="image-section">
+                    <img src="${char.img}" class="character-img" onerror="this.src='https://via.placeholder.com/400x600?text=No+Image'">
+                </div>
+            `;
+        }
+
+        loadProfile();
+    </script>
+</body>
+</html>

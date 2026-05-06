@@ -54,6 +54,7 @@
         /* Shapes */
         .shape-pin { width: 10px; height: 10px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); }
         .shape-square { width: 9px; height: 9px; border-radius: 4px; }
+        .shape-circle { width: 9px; height: 9px; border-radius: 50%; }
 
         /* Colors */
         .red1 { background-color: #98130b; }
@@ -63,18 +64,18 @@
         .koben { background-color: #05154a; }
         .cherokee { background-color: #257928; }
         .trans { background-color: #95a5a6; } /* Visible Grey */
-	.kamchatka { background-color: #fdd000; }
-	.jepang { background-color: #0f6c9d; }
-	.korea { background-color: #3d6680; } 
-	.samarkand { background-color: #a379d2; }
-	.ottoman { background-color: #e06055; }
-	.diriyah { background-color: #22fffd; }
-	.hausa { background-color: #be7e28; }
-	.adiwerna { background-color: #15b100; }
-	.yue { background-color: #8a2a9b; }
-	.gulkala { background-color: #686868; }
-	.hausa { background-color: #bd7d28; }
-	.champa { background-color: #2c0c0e; }
+        .kamchatka { background-color: #fdd000; }
+        .jepang { background-color: #0f6c9d; }
+        .korea { background-color: #3d6680; } 
+        .samarkand { background-color: #a379d2; }
+        .ottoman { background-color: #e06055; }
+        .diriyah { background-color: #22fffd; }
+        .hausa { background-color: #be7e28; }
+        .adiwerna { background-color: #15b100; }
+        .yue { background-color: #8a2a9b; }
+        .gulkala { background-color: #686868; }
+        .hausa { background-color: #bd7d28; }
+        .champa { background-color: #2c0c0e; }
         
         /* --- TOOLTIP STYLES --- */
         .marker .tooltip {
@@ -161,6 +162,14 @@
             </div>
         </div>
 
+        <div class="marker shape-square champa" style="top: 27.7%; left: 55.6%;">
+            <div class="tooltip">
+                <div class="tooltip-header"><h3>Tembagapura</h3><div class="short-desc">Champa Colonized Territory</div></div>
+                <img src="Tembagapura.jpeg" class="tooltip-img">
+                <div class="tooltip-body">Country that was colonized by Champa.</div>
+            </div>
+        </div>
+
         <div class="marker shape-pin bharat" style="top: 33%; left: 67.8%;">
             <div class="tooltip">
                 <div class="tooltip-header"><h3>Bharat</h3><div class="short-desc">Bharat Country</div></div>
@@ -215,7 +224,7 @@
         <div class="marker shape-pin trans flip" style="top: 11%; left: 63%;">
             <div class="tooltip">
                 <div class="tooltip-header"><h3>Conflict Area 1</h3><div class="short-desc">Non Sovereign Nation</div></div>
-                <img src="Onderland.jpeg" class="tooltip-img">
+                <img src="conflict.png" class="tooltip-img">
                 <div class="tooltip-body">Area where conflict is happening all the time.</div>
             </div>
         </div>
@@ -223,7 +232,7 @@
         <div class="marker shape-pin trans flip" style="top: 56.5%; left: 31%;">
             <div class="tooltip">
                 <div class="tooltip-header"><h3>Conflict Area 2</h3><div class="short-desc">Non Sovereign Nation</div></div>
-                <img src="Onderland.jpeg" class="tooltip-img">
+                <img src="conflict.png" class="tooltip-img">
                 <div class="tooltip-body">Area where conflict is happening all the time.</div>
             </div>
         </div>
@@ -231,7 +240,7 @@
         <div class="marker shape-pin trans" style="top: 94%; left: 50%;">
             <div class="tooltip">
                 <div class="tooltip-header"><h3>Conflict Area 3</h3><div class="short-desc">Non Sovereign Nation</div></div>
-                <img src="Onderland.jpeg" class="tooltip-img">
+                <img src="conflict.png" class="tooltip-img">
                 <div class="tooltip-body">Area where conflict is happening all the time.</div>
             </div>
         </div>
@@ -239,7 +248,7 @@
         <div class="marker shape-pin trans flip" style="top: 4.3%; left: 39.9%;">
             <div class="tooltip">
                 <div class="tooltip-header"><h3>Conflict Area 4</h3><div class="short-desc">Non Sovereign Nation</div></div>
-                <img src="Onderland.jpeg" class="tooltip-img">
+                <img src="conflict.png" class="tooltip-img">
                 <div class="tooltip-body">Area where conflict is happening all the time.</div>
             </div>
         </div>
@@ -310,7 +319,7 @@
             </div>
         </div>
 
-	 <div class="marker shape-pin hausa" style="top: 60%; left: 53.5%;">
+	    <div class="marker shape-pin hausa" style="top: 60%; left: 53.5%;">
             <div class="tooltip">
                 <div class="tooltip-header"><h3>Hausa</h3><div class="short-desc">Hausa Federation</div></div>
                 <img src="hausa.jpeg" class="tooltip-img">
@@ -318,11 +327,45 @@
             </div>
         </div>
 
-	<div class="marker shape-pin champa flip" style="top: 40%; left: 75.35%;">
+	    <div class="marker shape-pin champa flip" style="top: 40%; left: 75.35%;">
             <div class="tooltip">
                 <div class="tooltip-header"><h3>Champa</h3><div class="short-desc">Champa Empire</div></div>
                 <img src="champa.jpeg" class="tooltip-img">
                 <div class="tooltip-body">A disciplined maritime empire in Southeast Asia, forged from a blend of Cham and Dai Viet peoples, driven by military industries, shipbuilding, and resource processing.</div>
+            </div>
+        </div>
+
+     <!-- --- War Zones --- -->
+    
+        <div class="marker shape-circle trans flip" style="top: 34.5%; left: 79.29%;">
+            <div class="tooltip">
+                <div class="tooltip-header"><h3>Taiwan Frontline</h3><div class="short-desc">Taiwan War Area</div></div>
+                <img src="taiwan.jpeg" class="tooltip-img">
+                <div class="tooltip-body">Proxy battle between Nusantara and Champa</div>
+            </div>
+        </div>
+    
+        <div class="marker shape-circle trans flip" style="top: 18%; left: 47.7%;">
+            <div class="tooltip">
+                <div class="tooltip-header"><h3>Rotterdam Frontline</h3><div class="short-desc">Europe War Area</div></div>
+                <img src="rotterdam.jpeg" class="tooltip-img">
+                <div class="tooltip-body">Proxy battle between Nusantara and Champa</div>
+            </div>
+        </div>
+
+        <div class="marker shape-circle trans flip" style="top: 17.4%; left: 47%;">
+            <div class="tooltip">
+                <div class="tooltip-header"><h3>London Frontline</h3><div class="short-desc">Europe War Area</div></div>
+                <img src="london.jpeg" class="tooltip-img">
+                <div class="tooltip-body">Proxy battle between Nusantara and Champa</div>
+            </div>
+        </div>
+    
+        <div class="marker shape-circle trans flip" style="top: 15.2%; left: 55.3%;">
+            <div class="tooltip">
+                <div class="tooltip-header"><h3>Moskva Frontline</h3><div class="short-desc">Europe War Area</div></div>
+                <img src="moskva.jpeg" class="tooltip-img">
+                <div class="tooltip-body">Proxy battle between Nusantara and Champa</div>
             </div>
         </div>
 

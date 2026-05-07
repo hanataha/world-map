@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Character Archive | List</title>
-    <!-- 1. ADD SUPABASE LIBRARY -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
@@ -23,8 +22,24 @@
             align-items: center;
             padding: 50px 20px;
         }
-        .header { width: 100%; max-width: 1000px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
-        h1 { background: linear-gradient(90deg, #fff, var(--accent-blue)); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header { width: 100%; max-width: 1000px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        
+        /* Search Bar Styling */
+        .search-container { width: 100%; max-width: 1000px; margin-bottom: 30px; }
+        #search-input { 
+            width: 100%; 
+            padding: 15px; 
+            border-radius: 15px; 
+            border: 1px solid var(--border-color); 
+            background: rgba(255,255,255,0.05); 
+            color: white; 
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        #search-input:focus { border-color: var(--accent-blue); }
+
+        h1 { background: linear-gradient(90deg, #fff, var(--accent-blue)); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0; }
         
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; width: 100%; max-width: 1000px; }
         .char-card {
@@ -71,10 +86,7 @@
             box-shadow: 0 0 15px rgba(34, 211, 238, 0.4);
         }
 
-        .back-btn::before {
-            content: '«';
-            font-size: 14px;
-        }
+        .back-btn::before { content: '«'; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -82,31 +94,32 @@
         <h1>Character Archive</h1>
         <a href="crudpage.html" class="crud-link">Manage Database</a>
     </div>
+
+    <div class="search-container">
+        <input type="text" id="search-input" placeholder="Search neural link by name or subtitle..." onkeyup="filterCharacters()">
+    </div>
+
     <div class="grid" id="char-grid">
         <p style="color:var(--accent-blue)">Connecting to neural network...</p>
     </div>
 
     <script>
-        // 2. SUPABASE CONNECTION (Using supabaseClient to avoid naming conflicts)
         const supabaseUrl = 'https://qamxewtxqpjnanfnukyf.supabase.co';
         const supabaseKey = 'sb_publishable_P1xM99HgR3CHIeOn8VRrlw_4DwYmDeG'; 
-        
-        // Use a unique name here: supabaseClient
         const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
         const grid = document.getElementById('char-grid');
 
-        // 3. ASYNC FUNCTION TO FETCH FROM CLOUD
+        // 1. Fetch data from Supabase
         async function fetchCharacters() {
             try {
-                // Call supabaseClient instead of supabase
                 const { data, error } = await supabaseClient
                     .from('characters')
                     .select('*');
 
                 if (error) throw error;
 
-                grid.innerHTML = ''; // Clear the loading text
+                grid.innerHTML = ''; 
 
                 if (!data || data.length === 0) {
                     grid.innerHTML = `<p style="color:var(--accent-blue)">No characters found in the cloud database.</p>`;
@@ -118,8 +131,8 @@
                         <a href="profile.html?id=${char.id}" class="char-card">
                             <img src="${char.img}" class="char-img" onerror="this.src='https://via.placeholder.com/250x200?text=No+Image'">
                             <div class="char-info">
-                                <h3 style="margin:0">${char.name}</h3>
-                                <small style="color:var(--accent-blue)">${char.subtitle}</small>
+                                <h3 class="char-name" style="margin:0">${char.name}</h3>
+                                <small class="char-subtitle" style="color:var(--accent-blue)">${char.subtitle}</small>
                             </div>
                         </a>
                     `;
@@ -130,7 +143,24 @@
             }
         }
 
-        // Initial Load
+        // 2. Search filtering logic
+        function filterCharacters() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const cards = document.querySelectorAll('.char-card');
+
+            cards.forEach(card => {
+                const name = card.querySelector('.char-name').innerText.toLowerCase();
+                const subtitle = card.querySelector('.char-subtitle').innerText.toLowerCase();
+
+                // Show card if name or subtitle matches search term
+                if (name.includes(searchTerm) || subtitle.includes(searchTerm)) {
+                    card.style.display = "block";
+                } else {
+                    card.style.display = "none";
+                }
+            });
+        }
+
         fetchCharacters();
     </script>
 

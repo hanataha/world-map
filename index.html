@@ -3,71 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UDverse World</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;600&display=swap" rel="stylesheet">
+    <title>UDverse Hub</title>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
     <style>
         :root {
-            --card-bg: rgba(149, 165, 166, 0.2); 
+            --card-bg: rgba(15, 23, 42, 0.5);
             --accent: #38bdf8;
+            --accent-glow: rgba(56, 189, 248, 0.4);
             --text: #f8fafc;
         }
 
-        body {
+        /* Prevent the phone from scrolling sideways */
+        html, body {
             margin: 0;
             padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden; 
+            background-color: #020617; /* Solid dark base */
+        }
+
+        body {
             font-family: 'Inter', sans-serif;
             color: var(--text);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            overflow: hidden;
-            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
-                        url('Cherokee.jpeg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Vignette + Gradient Overlay as the main background */
+        .background-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Created a deeper radial effect for a "Portal" look */
+            background: radial-gradient(circle at center, rgba(15, 23, 42, 0.4) 0%, rgba(2, 6, 23, 1) 100%);
+            z-index: -1;
         }
 
         header {
             text-align: center;
             margin-bottom: 3rem;
             z-index: 1;
+            padding: 0 20px;
         }
 
         h1 {
-            font-size: 3rem;
-            letter-spacing: -1px;
-            margin: 0 0 0.5rem 0;
-            text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2rem, 8vw, 3.5rem);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin: 0;
+            color: #fff;
+            text-shadow: 0 0 20px var(--accent-glow);
         }
 
         .subtitle {
-            color: #cbd5e1;
+            color: var(--accent);
             font-weight: 300;
-            font-size: 1.1rem;
-            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: clamp(0.7rem, 3vw, 0.9rem);
+            margin-top: 10px;
+            opacity: 0.8;
         }
 
+        /* Grid Layout */
         .container {
             display: grid;
-            grid-template-columns: repeat(2, 300px);
-            gap: 2rem;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            width: 90%;
+            max-width: 800px;
             z-index: 1;
         }
 
+        /* Glassmorphism Card Style */
         .card {
             background: var(--card-bg);
-            backdrop-filter: blur(10px); 
-            -webkit-backdrop-filter: blur(10px);
-            padding: 2.5rem 2rem;
+            backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px);
+            padding: 2.5rem 1.5rem;
             border-radius: 20px;
             text-decoration: none;
             color: inherit;
             text-align: center;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255, 255, 255, 0.05);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -75,36 +105,49 @@
         }
 
         .card:hover {
-            transform: translateY(-10px);
+            transform: translateY(-10px) scale(1.02);
             border-color: var(--accent);
-            background: rgba(30, 41, 59, 0.9);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            background: rgba(30, 41, 59, 0.6);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5), 0 0 15px var(--accent-glow);
         }
 
-        .icon {
-            font-size: 3.5rem;
+        .card:active { transform: scale(0.95); }
+
+        /* Icon Styling */
+        .icon { 
+            color: var(--accent);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover .icon {
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 8px var(--accent));
         }
 
-        .card h2 {
-            margin: 0;
-            font-size: 1.5rem;
+        .card h2 { 
+            font-family: 'Orbitron', sans-serif;
+            margin: 0; 
+            font-size: 1.1rem; 
+            letter-spacing: 1px;
         }
 
-        .card p {
-            font-size: 0.95rem;
-            color: #94a3b8;
-            line-height: 1.5;
-            margin: 0;
+        .card p { 
+            font-size: 0.85rem; 
+            color: #94a3b8; 
+            line-height: 1.4; 
+            margin: 0; 
+            font-weight: 300;
         }
 
-        @media (max-width: 680px) {
+        /* --- MOBILE FIXES --- */
+        @media (max-width: 600px) {
             .container {
                 grid-template-columns: 1fr;
-                gap: 1.5rem;
+                width: 85%;
             }
             body {
-                height: auto;
-                padding: 3rem 1rem;
+                justify-content: flex-start;
+                padding: 10vh 0;
                 overflow-y: auto;
             }
         }
@@ -112,36 +155,46 @@
 </head>
 <body>
 
+    <div class="background-overlay"></div>
+
     <header>
-        <h1>UDverse World</h1>
-        <p class="subtitle">Welcome to the UDverse World</p>
+        <h1>UDverse Terminal</h1>
+        <p class="subtitle">Multi-Dimensional Access Portal</p>
     </header>
 
     <main class="container">
+        <!-- Map -->
         <a href="map.html" class="card">
-            <div class="icon">🌍</div>
-            <h2>Interactive Map</h2>
-            <p>Explore the world visually.</p>
+            <div class="icon"><i data-lucide="map"></i></div>
+            <h2>Cartography</h2>
+            <p>Interactive spatial overview of the realms.</p>
         </a>
 
+        <!-- Currency -->
         <a href="kurs.html" class="card">
-            <div class="icon">💱</div>
-            <h2>Currency</h2>
-            <p>Currency comparison viewer.</p>
+            <div class="icon"><i data-lucide="refresh-cw"></i></div>
+            <h2>Exchange</h2>
+            <p>Real-time Koranium value comparison.</p>
         </a>
 
+        <!-- Profile -->
         <a href="charlist.html" class="card">
-            <div class="icon">👤</div>
-            <h2>Character List</h2>
-            <p>View all characters in the archive.</p>
+            <div class="icon"><i data-lucide="user-cog"></i></div>
+            <h2>Registry</h2>
+            <p>Access encrypted character biographies.</p>
         </a>
 
-        <a href="blank.html" class="card">
-            <div class="icon">⏳</div>
-            <h2>Coming soon</h2>
-            <p>Stay tuned for more features!</p>
+        <!-- Coming Soon -->
+        <a href="blank.html" class="card" style="opacity: 0.6;">
+            <div class="icon"><i data-lucide="shield-alert"></i></div>
+            <h2>Terminals</h2>
+            <p>Additional modules currently locked.</p>
         </a>
     </main>
 
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+    </script>
 </body>
 </html>

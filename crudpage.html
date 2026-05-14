@@ -168,16 +168,34 @@
         async function deleteChar(id) {
             if (!confirm("Are you sure you want to delete this character?")) return;
 
-            const { error } = await supabaseClient
+            // 1. First, find the character to get their image URL
+            const { data: charData } = await supabaseClient
+                .from('characters')
+                .select('img')
+                .eq('id', id)
+                .single();
+
+            // 2. Delete the row from the database table
+            const { error: tableError } = await supabaseClient
                 .from('characters')
                 .delete()
                 .eq('id', id);
 
-            if (error) {
-                alert("Delete failed: " + error.message);
-            } else {
-                loadList();
+            if (tableError) {
+                alert("Delete failed: " + tableError.message);
+                return;
             }
+
+            // 3. Optional: Delete the image file from storage
+            if (charData && charData.img) {
+                const filePath = charData.img.split('/').pop(); // Gets the filename from the URL
+                await supabaseClient.storage
+                    .from('character-images')
+                    .remove([filePath]);
+            }
+
+            alert("Character purged from neural link.");
+            loadList();
         }
     </script>
 </body>

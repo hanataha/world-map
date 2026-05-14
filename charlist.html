@@ -24,8 +24,8 @@
         }
         .header { width: 100%; max-width: 1000px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         
-        /* Search Bar Styling */
         .search-container { width: 100%; max-width: 1000px; margin-bottom: 30px; }
+        
         #search-input { 
             width: 100%; 
             padding: 15px; 
@@ -36,8 +36,27 @@
             font-size: 1rem;
             outline: none;
             transition: border-color 0.3s;
+            box-sizing: border-box;
         }
         #search-input:focus { border-color: var(--accent-blue); }
+
+        /* Sort Controls Styling */
+        .sort-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .sort-select {
+            background: rgba(255,255,255,0.05);
+            color: white;
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            border-radius: 10px;
+            outline: none;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+        }
+        .sort-select:focus { border-color: var(--accent-blue); }
 
         h1 { background: linear-gradient(90deg, #fff, var(--accent-blue)); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0; }
         
@@ -97,6 +116,18 @@
 
     <div class="search-container">
         <input type="text" id="search-input" placeholder="Search neural link by name or subtitle..." onkeyup="filterCharacters()">
+        
+        <!-- New Sort UI -->
+        <div class="sort-controls">
+            <select id="sort-field" class="sort-select" onchange="fetchCharacters()">
+                <option value="name">Sort by Name</option>
+                <option value="id">Sort by Upload Date</option>
+            </select>
+            <select id="sort-order" class="sort-select" onchange="fetchCharacters()">
+                <option value="asc">Ascending</option>
+                <option value="desc">Descending</option>
+            </select>
+        </div>
     </div>
 
     <div class="grid" id="char-grid">
@@ -110,12 +141,18 @@
 
         const grid = document.getElementById('char-grid');
 
-        // 1. Fetch data from Supabase
+        // Fetch data from Supabase with Sorting
         async function fetchCharacters() {
             try {
+                // Get current sorting values from dropdowns
+                const field = document.getElementById('sort-field').value;
+                const order = document.getElementById('sort-order').value;
+                const isAscending = (order === 'asc');
+
                 const { data, error } = await supabaseClient
                     .from('characters')
-                    .select('*');
+                    .select('*')
+                    .order(field, { ascending: isAscending });
 
                 if (error) throw error;
 
@@ -137,13 +174,17 @@
                         </a>
                     `;
                 });
+
+                // Apply current search filter to the new sort results
+                filterCharacters();
+
             } catch (err) {
                 console.error('Fetch error:', err);
                 grid.innerHTML = `<p style="color:#ff4d4d">Error: ${err.message || err}</p>`;
             }
         }
 
-        // 2. Search filtering logic
+        // Search filtering logic
         function filterCharacters() {
             const searchTerm = document.getElementById('search-input').value.toLowerCase();
             const cards = document.querySelectorAll('.char-card');
@@ -152,7 +193,6 @@
                 const name = card.querySelector('.char-name').innerText.toLowerCase();
                 const subtitle = card.querySelector('.char-subtitle').innerText.toLowerCase();
 
-                // Show card if name or subtitle matches search term
                 if (name.includes(searchTerm) || subtitle.includes(searchTerm)) {
                     card.style.display = "block";
                 } else {
@@ -161,6 +201,7 @@
             });
         }
 
+        // Initial load
         fetchCharacters();
     </script>
 

@@ -1,408 +1,242 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UDverse Interactive Map</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background-color: #eef2f3;
-            padding: 40px;
-        }
-
-        .map-container {
-            position: relative;
-            display: inline-block;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-            border: 8px solid white;
-            border-radius: 4px;
-        }
-
-        #map-image {
-            display: block;
-            max-width: 100%;
-            height: auto;
-        }
-
-        /* --- MARKER BASE STYLES --- */
-        .marker {
-            position: absolute;
-            cursor: pointer;
-            z-index: 10;
-            border: 2px solid white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.4);
-            transition: transform 0.2s, opacity 0.3s;
-        }
-
-        .marker:hover {
-            z-index: 9999 !important;
-            transform: scale(1.2);
-        }
-
-        .marker.shape-pin:hover {
-            transform: rotate(-45deg) scale(1.2);
-        }
-
-        .map-container:hover .marker:not(:hover) {
-            opacity: 0.5;
-        }
-
-        /* Shapes */
-        .shape-pin { width: 10px; height: 10px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); }
-        .shape-square { width: 9px; height: 9px; border-radius: 4px; }
-        .shape-circle { width: 9px; height: 9px; border-radius: 50%; }
-
-        /* Colors */
-        .red1 { background-color: #98130b; }
-        .blue { background-color: #3498db; }
-        .bharat { background-color: #c3c853; }
-        .whiteg { background-color: #d7d7da; }
-        .koben { background-color: #05154a; }
-        .cherokee { background-color: #257928; }
-        .trans { background-color: #95a5a6; } /* Visible Grey */
-        .kamchatka { background-color: #fdd000; }
-        .jepang { background-color: #0f6c9d; }
-        .korea { background-color: #3d6680; } 
-        .samarkand { background-color: #a379d2; }
-        .ottoman { background-color: #e06055; }
-        .diriyah { background-color: #22fffd; }
-        .hausa { background-color: #be7e28; }
-        .adiwerna { background-color: #15b100; }
-        .yue { background-color: #8a2a9b; }
-        .gulkala { background-color: #686868; }
-        .hausa { background-color: #bd7d28; }
-        .champa { background-color: #2c0c0e; }
-        
-        /* --- TOOLTIP STYLES --- */
-        .marker .tooltip {
-            visibility: hidden;
-            opacity: 0;
-            width: 250px;
-            background-color: white;
-            color: #333;
-            border-radius: 10px;
-            padding: 0;
-            position: absolute;
-            bottom: 140%;
-            left: 50%;
-            transform: translateX(-50%);
-            transition: all 0.3s ease-out;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-            z-index: 100;
-            overflow: hidden;
-            pointer-events: none;
-        }
-
-        /* Pin rotation correction */
-        .shape-pin .tooltip { transform: translateX(-50%) rotate(45deg); }
-
-        .marker:hover .tooltip {
-            visibility: visible;
-            opacity: 1;
-            bottom: 160%;
-        }
-
-        .marker.flip .tooltip {
-            bottom: auto;
-            top: 140%;
-        }
-
-        .marker.flip:hover .tooltip {
-            bottom: auto;
-            top: 160%;
-        }
-
-        .tooltip-header { padding: 12px 12px 5px 12px; }
-        .tooltip-header h3 { margin: 0; font-size: 18px; color: #111; line-height: 1.2; }
-        .tooltip-header .short-desc { margin: 2px 0 8px 0; font-size: 13px; color: #777; font-style: italic; }
-
-        .tooltip-img {
-            width: 100%;
-            height: 140px;
-            object-fit: cover;
-            display: block;
-            background-color: #ddd;
-        }
-
-        .tooltip-body {
-            padding: 12px;
-            font-size: 13px;
-            line-height: 1.5;
-            color: #444;
-            border-top: 1px solid #eee;
-        }
-
-        .back-btn {
-            margin-top: 30px;
-            padding: 12px 30px;
-            background-color: white;
-            color: #333;
-            text-decoration: none;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 14px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-            border: 1px solid #ddd;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .back-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-            background-color: #fdfdfd;
-            border-color: #3498db;
-            color: #3498db;
-        }
-
-        /* Subtle arrow icon style */
-        .back-btn::before {
-            content: '←';
-            font-size: 18px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a1230">
+<title>UDverse Interactive Map</title>
+<link rel="preload" as="image" href="assets/map/udverse-map.webp">
+<style>
+:root{--bg:#070d22;--panel:rgba(12,20,48,.92);--line:rgba(160,190,255,.22);--ink:#e8eeff;--mute:#9aa8cc;--acc:#7fb4ff;--gold:#e9c46a;--danger:#ff7a6b;--r:12px}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;overflow:hidden}
+button,input{font:inherit;color:inherit}
+.app{display:grid;grid-template-rows:auto 1fr;height:100vh;height:100dvh;width:100%}
+.hud{display:flex;align-items:center;gap:10px;padding:8px 12px;padding-top:max(8px,env(safe-area-inset-top));background:linear-gradient(#0c1638,#0a1230);border-bottom:1px solid var(--line);min-width:0}
+.back{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border:1px solid var(--line);border-radius:999px;text-decoration:none;color:var(--ink);font-size:14px;white-space:nowrap}
+.back:hover,.back:focus-visible{border-color:var(--acc);color:var(--acc)}
+.title{font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:14px;color:var(--gold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0}
+.title small{display:block;font-weight:400;letter-spacing:.04em;text-transform:none;color:var(--mute);font-size:12px}
+.search{position:relative;flex:0 1 260px;min-width:0}
+.search input{width:100%;padding:9px 12px;border-radius:999px;border:1px solid var(--line);background:#0b1430;outline:none}
+.search input:focus{border-color:var(--acc)}
+.results{position:absolute;top:110%;left:0;right:0;z-index:30;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);list-style:none;margin:0;padding:4px;max-height:50vh;overflow:auto;display:none}
+.results.open{display:block}
+.results li{padding:8px 10px;border-radius:8px;cursor:pointer;display:flex;gap:8px;align-items:center;font-size:14px}
+.results li[aria-selected=true],.results li:hover{background:rgba(127,180,255,.15)}
+.main{position:relative;display:grid;grid-template-columns:1fr 340px;min-height:0;min-width:0}
+.stage{position:relative;overflow:hidden;min-width:0;background:radial-gradient(ellipse at center,#0f1d4a,#060b1d);touch-action:none;cursor:grab;outline:none}
+.stage.drag{cursor:grabbing}
+.stage:focus-visible{box-shadow:inset 0 0 0 2px var(--acc)}
+#map{position:absolute;inset:0;width:100%;height:100%;display:block}
+.loading{position:absolute;inset:0;display:grid;place-items:center;color:var(--mute);font-size:14px;pointer-events:none}
+.region{cursor:pointer;fill-opacity:0;stroke-opacity:0;stroke-width:1.4;vector-effect:non-scaling-stroke;transition:fill-opacity .15s,stroke-opacity .15s}
+.region.zone{fill-opacity:.12;stroke-opacity:.7;stroke-dasharray:4 3}
+.region.front{fill-opacity:.18;stroke-opacity:.9}
+.region:hover,.region.hover{fill-opacity:.35;stroke-opacity:1;stroke:#fff}
+.region:focus{outline:none}
+.region:focus-visible,.region.sel{fill-opacity:.45;stroke-opacity:1;stroke:#fff;stroke-width:2.6}
+.region.dim{opacity:.0;pointer-events:none}
+.mapdim .region:not(.sel):not(:hover):not(.zone):not(.front){fill-opacity:0}
+.lbl{font-size:10px;fill:#fff;paint-order:stroke;stroke:#050a1c;stroke-width:3px;pointer-events:none;text-anchor:middle;font-weight:600;letter-spacing:.03em;opacity:.85}
+.lbl.dim{display:none}
+.tip{position:absolute;z-index:20;pointer-events:none;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:13px;white-space:nowrap;transform:translate(-50%,-130%);display:none}
+.tip b{display:block}.tip span{color:var(--mute);font-size:12px}
+.ctrls{position:absolute;right:12px;top:12px;display:flex;flex-direction:column;gap:6px;z-index:10}
+.ctrls button,.chip{background:var(--panel);border:1px solid var(--line);border-radius:10px;cursor:pointer}
+.ctrls button{width:44px;height:44px;font-size:20px;line-height:1}
+.ctrls button:hover,.ctrls button:focus-visible,.chip:focus-visible{border-color:var(--acc);outline:none}
+.legend{position:absolute;left:12px;bottom:12px;z-index:10;display:flex;flex-wrap:wrap;gap:6px;max-width:calc(100% - 24px)}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:8px 10px;font-size:13px;min-height:40px}
+.chip[aria-pressed=false]{opacity:.45;text-decoration:line-through}
+.sw{width:14px;height:10px;border-radius:3px;display:inline-block;border:1px solid #fff8}
+.sw.zone{border-style:dashed;background:transparent!important}
+.panel{background:var(--panel);border-left:1px solid var(--line);overflow:auto;min-width:0;display:flex;flex-direction:column}
+.ph{padding:14px 16px 6px;display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.ph h2{margin:0;font-size:22px;line-height:1.15}
+.ph .sub{color:var(--mute);font-style:italic;font-size:14px;margin-top:2px}
+.close{background:none;border:1px solid var(--line);border-radius:8px;width:36px;height:36px;cursor:pointer;flex:none;display:none}
+.badge{align-self:flex-start;display:inline-block;margin:0 16px 8px;padding:3px 8px;border-radius:999px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--line);color:var(--mute)}
+.pimg{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;background:#0b1430}
+.pbody{padding:12px 16px;font-size:15px;line-height:1.55;color:#d3dcf5}
+.note,.approx{margin:0 16px 10px;padding:8px 10px;border-radius:8px;font-size:12.5px;line-height:1.45}
+.note{background:rgba(233,196,106,.1);border:1px solid rgba(233,196,106,.35);color:#f3dfa6}
+.approx{background:rgba(127,180,255,.08);border:1px solid var(--line);color:var(--mute)}
+.pnav{display:flex;gap:8px;padding:6px 16px 16px}
+.pnav button{flex:1;padding:10px;border-radius:10px;background:#0b1430;border:1px solid var(--line);cursor:pointer}
+.pnav button:focus-visible,.pnav button:hover{border-color:var(--acc);outline:none}
+.intro{padding:18px 16px;color:var(--mute);font-size:14px;line-height:1.5}
+.intro h2{color:var(--ink);font-size:18px;margin:0 0 8px}
+.list{list-style:none;margin:8px 0 0;padding:0}
+.list button{width:100%;text-align:left;display:flex;align-items:center;gap:8px;padding:9px 6px;background:none;border:0;border-bottom:1px solid var(--line);cursor:pointer;font-size:14px}
+.list button:hover,.list button:focus-visible{color:var(--acc);outline:none}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (max-width:820px){
+ .main{grid-template-columns:1fr}
+ .title small{display:none}
+ .back .t{display:none}
+ .search{flex:1 1 auto}
+ .title{flex:0 1 auto;font-size:12px}
+ .panel{position:absolute;left:0;right:0;bottom:0;max-height:62%;border-left:0;border-top:1px solid var(--line);border-radius:16px 16px 0 0;transform:translateY(calc(100% - 52px));transition:transform .25s;z-index:25;padding-bottom:env(safe-area-inset-bottom)}
+ .panel.open{transform:none}
+ .panel::before{content:'';display:block;width:40px;height:4px;border-radius:2px;background:#fff4;margin:8px auto 0;flex:none}
+ .close{display:block}
+ .legend{bottom:62px}
+ .ctrls button{width:42px;height:42px}
+}
+@media (prefers-reduced-motion:reduce){*,*::before{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+</style>
 </head>
 <body>
-
-    <h1>World Interactive Map</h1>
-
-    <div class="map-container">
-        <img src="Gemini_Generated_Image_txuy34txuy34txuy_waifu2x_art_scan_noise3_scale.png" id="map-image">
-
-        <!-- --- COUNTRIES --- -->
-        
-        <div class="marker shape-pin red1" style="top: 48.5%; left: 78%;">
-            <div class="tooltip">
-                <div class="tooltip-header"><h3>Nusantara</h3><div class="short-desc">Nusantara Federation</div></div>
-                <img src="nusantara.jpeg" class="tooltip-img">
-                <div class="tooltip-body">A vast Austronesian-Melanesian archipelago of nearly a billion people, diverse in ethnicity and language, with a large, resource-rich economy and growing manufacturing sector.</div>
-            </div>
-        </div>
-
-        <div class="marker shape-square blue" style="top: 37.7%; left: 69.8%;">
-            <div class="tooltip">
-                <div class="tooltip-header"><h3>Mithrakeling</h3><div class="short-desc">Bharat Special Region</div></div>
-                <img src="Mithrakelling.jpeg" class="tooltip-img">
-                <div class="tooltip-body">Created to compete with basantara countries.</div>
-            </div>
-        </div>
-
-        <div class="marker shape-square champa" style="top: 27.7%; left: 55.6%;">
-            <div class="tooltip">
-                <div class="tooltip-header"><h3>Tembagapura</h3><div class="short-desc">Champa Colonized Territory</div></div>
-                <img src="tembagapura.jpeg" class="tooltip-img">
-                <div class="tooltip-body">Country that was colonized by Champa.</div>
-            </div>
-        </div>
-
-        <div class="marker shape-pin bharat" style="top: 33%; left: 67.8%;">
-            <div class="tooltip">
-                <div class="tooltip-header"><h3>Bharat</h3><div class="short-desc">Bharat Country</div></div>
-                <img src="Mithrakelling.jpeg" class="tooltip-img">
-                <div class="tooltip-body">The country where the bharat people reside.</div>
-            </div>
-        </div>
-
-        <div class="marker shape-square blue" style="top: 53%; left: 76.7%;">
-            <div class="tooltip">
-                <div class="tooltip-header"><h3>Cisange</h3><div class="short-desc">Special Administrative Region</div></div>
-                <img src="Neo Jayantara.jpeg" class="tooltip-img">
-                <div class="tooltip-body">The Special Administrative Region that connects this world with multiverse. It's the richest in economy and the most modern in this world. It's a different territory from Nusantara.</div>
-            </div>
-        </div>
-
-        <div class="marker shape-square whiteg flip" style="top: 12%; left: 37.6%;">
-            <div class="tooltip">
-                <div class="tooltip-header"><h3>Onderland</h3><div class="short-desc">Onderland Republic</div></div>
-                <img src="Onderland.jpeg" class="tooltip-img">
-                <div class="tooltip-body">Arctic republic leading in cryo-technology.</div>
-            </div>
-        </div>
-
-        <div class="marker shape-square koben" style="top: 54.5%; left: 79.3%;">
-            <div class="tooltip">
-                <div class="tooltip-header"><h3>Kotabentala</h3><div class="short-desc">Kotabentala Country</div></div>
-                <img src="Koben.jpeg" class="tooltip-img">
-                <div class="tooltip-body">A small but immensely wealthy energy superpower built on the world’s finest refined oil, known for its homogeneous Sumbawa-Bugis society and state-owned Hyperenergy. It's a different territory from Nusantara.</div>
-            </div>
-        </div>
-
-        <div class="marker shape-pin cherokee flip" style="top: 20%; left: 21.7%;">
-            <div class="tooltip">
-                <div class="tooltip-header"><h3>Cherokee</h3><div class="short-desc">Indigenous Country</div></div>
-                <img src="Cherokee.jpeg" class="tooltip-img">
-                <div class="tooltip-body">A stable, middle-power indigenous renaissance in northern America, valuing self-reliance, green landscapes, and cautious engagement with the wider world.
-		</div>
-            </div>
-        </div>
-
-        <div class="marker shape-pin adiwerna" style="top: 46.5%; left: 28%;">
-            <div class="tooltip">
-                <div class="tooltip-header"><h3>Adiwerna</h3><div class="short-desc">Adiwerna Sultanate</div></div>
-                <img src="Adiwerna.jpeg" class="tooltip-img">
-                <div class="tooltip-body">A young Javanese-diaspora sultanate in northern South America, known for its crude oil wealth, family-oriented welfare policies, and the calm, blended architecture of its capital, Kulonprojo.</div>
-            </div>
-        </div>
-
-        <!-- --- THE 4 CONFLICT AREAS --- -->
-        
-        <div class="marker shape-pin trans flip" style="top: 11%; left: 63%;">
-            <div class="tooltip">
-                <div class="tooltip-header"><h3>Conflict Area 1</h3><div class="short-desc">Non Sovereign Nation</div></div>
-                <img src="conflict.png" class="tooltip-img">
-                <div class="tooltip-body">Area where conflict is happening all the time.</div>
-            </div>
-        </div>
-
-        <div class="marker shape-pin trans flip" style="top: 56.5%; left: 31%;">
-            <div class="tooltip">
-                <div class="tooltip-header"><h3>Conflict Area 2</h3><div class="short-desc">Non Sovereign Nation</div></div>
-                <img src="conflict.png" class="tooltip-img">
-                <div class="tooltip-body">Area where conflict is happening all the time.</div>
-            </div>
-        </div>
-
-        <div class="marker shape-pin trans" style="top: 94%; left: 50%;">
-            <div class="tooltip">
-                <div class="tooltip-header"><h3>Conflict Area 3</h3><div class="short-desc">Non Sovereign Nation</div></div>
-                <img src="conflict.png" class="tooltip-img">
-                <div class="tooltip-body">Area where conflict is happening all the time.</div>
-            </div>
-        </div>
-
-        <div class="marker shape-pin trans flip" style="top: 4.3%; left: 39.9%;">
-            <div class="tooltip">
-                <div class="tooltip-header"><h3>Conflict Area 4</h3><div class="short-desc">Non Sovereign Nation</div></div>
-                <img src="conflict.png" class="tooltip-img">
-                <div class="tooltip-body">Area where conflict is happening all the time.</div>
-            </div>
-        </div>
-
-        <!-- --- ASIA & EMPIRES --- -->
-        
-        <div class="marker shape-pin kamchatka flip" style="top: 9.6%; left: 83.6%;">
-            <div class="tooltip">
-                <div class="tooltip-header"><h3>Kamchatka</h3><div class="short-desc">Kamchatka Country</div></div>
-                <img src="Kamchatka.jpeg" class="tooltip-img">
-                <div class="tooltip-body">A cold-tech pioneer at the far edge of the continent, born from Aztec refugees and native alliances, now a global leader in advanced computing and data centres.</div>
-            </div>
-        </div>
-
-        <div class="marker shape-pin jepang flip" style="top: 26.2%; left: 82.7%;">
-            <div class="tooltip">
-                <div class="tooltip-header"><h3>Jepang</h3><div class="short-desc">UDverse Jepang</div></div>
-                <img src="Jepang.jpeg" class="tooltip-img">
-                <div class="tooltip-body">An old empire that still holds.</div>
-            </div>
-        </div>
-
-        <div class="marker shape-pin korea flip" style="top: 23.3%; left: 78.7%;">
-            <div class="tooltip">
-                <div class="tooltip-header"><h3>Korea</h3><div class="short-desc">Unified Korea</div></div>
-                <img src="Korea.jpeg" class="tooltip-img">
-                <div class="tooltip-body">Korea that has been unified.</div>
-            </div>
-        </div>
-
-        <div class="marker shape-pin yue flip" style="top: 24.3%; left: 74.7%;">
-            <div class="tooltip">
-                <div class="tooltip-header"><h3>Yue</h3><div class="short-desc">UDverse China</div></div>
-                <img src="Yue.jpeg" class="tooltip-img">
-                <div class="tooltip-body">Alternative China.</div>
-            </div>
-        </div>
-
-        <div class="marker shape-pin samarkand flip" style="top: 21.2%; left: 65.3%;">
-            <div class="tooltip">
-                <div class="tooltip-header"><h3>Samarkand</h3><div class="short-desc">United Middle Asia</div></div>
-                <img src="Samarkand.jpeg" class="tooltip-img">
-                <div class="tooltip-body">A unified Central Asian state, heir to the Silk Road empires, neutral by policy, and built on natural gas, cotton, livestock, and cross-continental rail trade.</div>
-            </div>
-        </div>
-
-        <div class="marker shape-pin ottoman flip" style="top: 24.6%; left: 55.4%;">
-            <div class="tooltip">
-                <div class="tooltip-header"><h3>Ottoman</h3><div class="short-desc">Ottoman Empire</div></div>
-                <img src="Ottoman.jpeg" class="tooltip-img">
-                <div class="tooltip-body">A vast, decentralised monarchy spanning the Balkans, Anatolia, the Levant, North Africa, and the Arabian Gulf, with a pluralistic society and an economy based on agriculture, pilgrimage, and foreign-partnered oil.</div>
-            </div>
-        </div>
-
-        <div class="marker shape-pin diriyah flip" style="top: 43%; left: 54.0%;">
-            <div class="tooltip">
-                <div class="tooltip-header"><h3>Diriyah</h3><div class="short-desc">Unified Arabian</div></div>
-                <img src="Diriyah.jpeg" class="tooltip-img">
-                <div class="tooltip-body">A central Arabian power controlling the holy cities, drawing wealth from pilgrimage, trans-Saharan trade, and gold, projecting soft power across four continents.</div>
-            </div>
-        </div>
-
-        <div class="marker shape-pin gulkala" style="top: 63.6%; left: 82.5%;">
-            <div class="tooltip">
-                <div class="tooltip-header"><h3>Gulkala</h3><div class="short-desc">Gulkala Country</div></div>
-                <img src="Gulkala.jpeg" class="tooltip-img">
-                <div class="tooltip-body">Australian and New zealand country.</div>
-            </div>
-        </div>
-
-	    <div class="marker shape-pin hausa" style="top: 60%; left: 53.5%;">
-            <div class="tooltip">
-                <div class="tooltip-header"><h3>Hausa</h3><div class="short-desc">Hausa Federation</div></div>
-                <img src="hausa.jpeg" class="tooltip-img">
-                <div class="tooltip-body">A sprawling sub-Saharan federation from the Atlantic to Madagascar, young and resource-rich (oil, cobalt, rare earths), known for pragmatic diplomacy and strong national identity.</div>
-            </div>
-        </div>
-
-	    <div class="marker shape-pin champa flip" style="top: 40%; left: 75.35%;">
-            <div class="tooltip">
-                <div class="tooltip-header"><h3>Champa</h3><div class="short-desc">Champa Empire</div></div>
-                <img src="champa.jpeg" class="tooltip-img">
-                <div class="tooltip-body">A disciplined maritime empire in Southeast Asia, forged from a blend of Cham and Dai Viet peoples, driven by military industries, shipbuilding, and resource processing.</div>
-            </div>
-        </div>
-
-     <!-- --- War Zones --- -->
-    
-        <div class="marker shape-circle trans flip" style="top: 34.5%; left: 79.29%;">
-            <div class="tooltip">
-                <div class="tooltip-header"><h3>Taiwan Frontline</h3><div class="short-desc">Taiwan War Area</div></div>
-                <img src="taiwan.jpeg" class="tooltip-img">
-                <div class="tooltip-body">Proxy battle between Nusantara and Champa</div>
-            </div>
-        </div>
-    
-        <div class="marker shape-circle trans flip" style="top: 18%; left: 47.7%;">
-            <div class="tooltip">
-                <div class="tooltip-header"><h3>Rotterdam Frontline</h3><div class="short-desc">Europe War Area</div></div>
-                <img src="Rotterdam.jpeg" class="tooltip-img">
-                <div class="tooltip-body">Proxy battle between Nusantara and Champa</div>
-            </div>
-        </div>
-
-        <div class="marker shape-circle trans flip" style="top: 17.4%; left: 47%;">
-            <div class="tooltip">
-                <div class="tooltip-header"><h3>London Frontline</h3><div class="short-desc">Europe War Area</div></div>
-                <img src="london.jpeg" class="tooltip-img">
-                <div class="tooltip-body">Proxy battle between Nusantara and Champa</div>
-            </div>
-        </div>
-    
-        <div class="marker shape-circle trans flip" style="top: 15.2%; left: 55.3%;">
-            <div class="tooltip">
-                <div class="tooltip-header"><h3>Moskva Frontline</h3><div class="short-desc">Europe War Area</div></div>
-                <img src="moskva.jpeg" class="tooltip-img">
-                <div class="tooltip-body">Proxy battle between Nusantara and Champa</div>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- Back Button -->
-    <a href="index.html" class="back-btn">Back to UDverse Home</a>
+<div class="app">
+ <header class="hud">
+  <a class="back" href="index.html" aria-label="Back to UDverse Home">&larr; <span class="t">UDverse Home</span></a>
+  <div class="title">World Interactive Map<small>Tap or hover a region to explore</small></div>
+  <div class="search" role="combobox" aria-expanded="false" aria-owns="results" aria-haspopup="listbox">
+   <input id="q" type="search" placeholder="Search nations, zones, fronts…" aria-label="Search locations" aria-autocomplete="list" aria-controls="results" autocomplete="off">
+   <ul id="results" class="results" role="listbox" aria-label="Search results"></ul>
+  </div>
+ </header>
+ <div class="main">
+  <div class="stage" id="stage" tabindex="0" aria-label="World map. Use arrow keys to pan, plus and minus to zoom, 0 to reset, Tab to move between regions.">
+   <div class="loading" id="loading">Loading map…</div>
+   <svg id="map" viewBox="0 0 1456 734" preserveAspectRatio="xMinYMin meet" role="group" aria-label="UDverse world regions">
+    <g id="vp">
+     <image id="mapimg" href="assets/map/udverse-map.webp" x="0" y="0" width="1456" height="734" aria-hidden="true"/>
+     <g id="regions"></g>
+     <g id="labels" aria-hidden="true"></g>
+    </g>
+   </svg>
+   <div class="tip" id="tip" aria-hidden="true"></div>
+   <div class="ctrls">
+    <button id="zin" aria-label="Zoom in" title="Zoom in">+</button>
+    <button id="zout" aria-label="Zoom out" title="Zoom out">&minus;</button>
+    <button id="zreset" aria-label="Reset view" title="Reset view">&#8634;</button>
+   </div>
+   <div class="legend" id="legend" role="group" aria-label="Show or hide categories"></div>
+  </div>
+  <aside class="panel" id="panel" aria-live="polite" aria-label="Location details"></aside>
+ </div>
+</div>
+<div class="sr" id="live" aria-live="polite"></div>
+<script>
+const DATA=[{"id":"conflict-area-3","name":"Conflict Area 3","sub":"Non Sovereign Nation","img":"conflict.png","thumb":"assets/thumbs/conflict.webp","body":"Area where conflict is happening all the time.","type":"conflict","color":"#95a5a6","x":728.0,"y":690.0,"d":"M1165,664L1142,650L1103,640L1093,640L1089,643L1041,643L1026,637L955,638L934,644L920,644L910,639L867,633L818,647L784,653L682,657L663,664L645,676L622,682L607,691L578,687L565,696L536,693L532,689L527,667L522,664L513,648L509,648L508,645L496,645L484,658L472,665L433,667L411,664L388,672L321,677L306,684L295,694L295,706L307,714L308,721L320,721L325,726L325,733L1128,733L1132,726L1132,715L1125,708L1127,698L1164,676Z","shape":"traced","area":64380,"i":11},{"id":"conflict-area-1","name":"Conflict Area 1","sub":"Non Sovereign Nation","img":"conflict.png","thumb":"assets/thumbs/conflict.webp","body":"Area where conflict is happening all the time.","type":"conflict","color":"#95a5a6","x":917.3,"y":80.7,"d":"M1215,49L1168,52L1094,39L1083,33L1069,33L1052,39L1009,35L1002,30L953,19L933,19L925,29L905,39L887,39L877,31L863,31L853,35L844,42L835,55L811,57L810,69L729,67L696,99L680,98L671,103L656,121L656,135L666,148L666,168L700,171L701,177L657,179L657,193L650,194L650,207L677,204L691,197L729,195L732,211L750,214L750,205L759,202L756,182L747,175L747,163L751,159L795,158L796,173L826,173L827,158L869,161L871,145L877,144L878,132L909,132L922,124L940,120L1008,118L1011,125L1021,125L1094,107L1149,113L1158,119L1180,120L1182,112L1204,110L1205,92L1201,89L1201,69L843,69L843,62L1212,62L1215,59Z","shape":"traced","area":47923,"i":9},{"id":"cherokee","name":"Cherokee","sub":"Indigenous Country","img":"Cherokee.jpeg","thumb":"assets/thumbs/cherokee.webp","body":"A stable, middle-power indigenous renaissance in northern America, valuing self-reliance, green landscapes, and cautious engagement with the wider world.","type":"nation","color":"#257928","x":316.0,"y":146.8,"d":"M483,46L454,46L448,49L445,56L449,58L449,63L443,67L438,67L436,62L432,61L432,52L427,52L426,46L420,46L420,58L417,61L409,62L403,68L396,68L395,63L399,60L399,50L384,49L378,44L361,42L351,48L351,52L361,53L358,64L329,59L295,63L285,59L244,54L209,64L208,74L192,74L191,79L195,79L196,84L183,86L173,91L172,102L177,102L179,107L190,109L194,106L195,101L202,97L213,98L219,97L221,94L236,97L245,102L246,115L251,119L250,137L248,138L251,150L230,184L229,193L232,210L238,213L241,226L245,226L246,223L253,226L253,235L272,266L272,279L296,293L311,293L320,302L335,307L342,315L343,322L350,323L352,298L349,295L334,295L340,270L332,271L324,283L311,285L306,282L301,271L306,243L321,232L339,233L343,228L353,228L365,232L368,250L372,250L373,225L378,219L401,205L402,197L417,181L429,177L429,173L438,166L449,162L461,164L461,160L458,159L460,146L456,145L458,139L482,139L489,135L498,135L499,127L496,121L488,116L487,102L482,101L476,106L471,106L468,102L468,94L463,90L448,90L447,96L441,102L441,111L432,120L426,122L419,135L412,134L412,119L407,119L399,113L388,110L387,100L397,91L427,78L432,78L433,82L440,82L440,74L451,70L452,65L458,59L472,58L476,63L476,72L469,77L472,86L485,89L486,85L492,85L493,77L506,74L506,69L499,66L498,57L489,53Z","shape":"traced","area":40412,"i":7},{"id":"conflict-area-2","name":"Conflict Area 2","sub":"Non Sovereign Nation","img":"conflict.png","thumb":"assets/thumbs/conflict.webp","body":"Area where conflict is happening all the time.","type":"conflict","color":"#95a5a6","x":451.4,"y":414.7,"d":"M496,358L486,358L484,372L481,375L467,375L461,385L440,391L415,390L410,394L400,395L393,403L381,409L367,410L367,421L372,430L398,459L406,547L417,591L435,613L453,623L467,623L472,618L472,606L463,588L463,563L483,534L491,527L503,505L507,491L531,468L539,442L539,433L551,409L550,393L542,381L520,373Z","shape":"traced","area":25578,"i":10},{"id":"ottoman","name":"Ottoman","sub":"Ottoman Empire","img":"Ottoman.jpeg","thumb":"assets/thumbs/ottoman.webp","body":"A vast, decentralised monarchy spanning the Balkans, Anatolia, the Levant, North Africa, and the Arabian Gulf, with a pluralistic society and an economy based on agriculture, pilgrimage, and foreign-partnered oil.","type":"nation","color":"#e06055","x":806.6,"y":180.6,"d":"M941,233L927,218L912,214L901,202L880,202L870,195L870,183L858,167L849,166L847,163L831,163L831,167L842,175L842,179L839,182L828,183L816,178L810,178L803,182L792,180L790,177L791,163L755,164L752,171L761,178L761,183L771,198L776,197L772,184L785,181L787,183L787,192L793,199L810,202L821,200L824,212L820,223L815,227L794,228L768,220L762,230L757,230L747,226L741,220L728,216L725,200L695,202L681,209L667,209L651,224L649,233L632,248L621,268L623,286L619,298L619,308L639,335L645,339L654,339L677,328L704,303L762,286L787,270L818,240L823,240L827,244L845,244L853,240L873,243L872,232L879,229L889,241L895,244L907,244L915,251L930,252L941,250Z","shape":"traced","area":23272,"i":18},{"id":"diriyah","name":"Diriyah","sub":"Unified Arabian","img":"Diriyah.jpeg","thumb":"assets/thumbs/diriyah.webp","body":"A central Arabian power controlling the holy cities, drawing wealth from pilgrimage, trans-Saharan trade, and gold, projecting soft power across four continents.","type":"nation","color":"#22fffd","x":786.2,"y":315.6,"d":"M916,267L902,257L888,259L861,246L834,250L843,273L857,291L859,306L853,308L840,297L828,268L824,264L819,251L815,249L788,276L767,290L701,311L694,321L681,332L665,341L681,341L694,336L703,336L711,345L721,345L726,351L724,374L739,398L756,391L773,391L793,377L803,377L815,372L845,372L875,347L887,322L886,317L862,321L857,317L856,311L890,296L895,290L901,288L912,278Z","shape":"traced","area":18197,"i":19},{"id":"yue","name":"Yue","sub":"UDverse China","img":"Yue.jpeg","thumb":"assets/thumbs/yue.webp","body":"Alternative China.","type":"nation","color":"#8a2a9b","x":1087.6,"y":178.4,"d":"M1169,126L1165,124L1154,125L1153,122L1148,122L1145,118L1129,118L1098,112L1052,122L1043,127L1030,127L1016,136L1026,146L1035,148L1046,164L1044,179L1033,197L1033,204L1039,217L1041,243L1052,248L1075,274L1084,256L1112,259L1118,270L1121,271L1126,267L1140,263L1151,251L1156,233L1153,230L1153,224L1139,210L1140,203L1144,198L1133,198L1128,194L1128,189L1132,186L1136,176L1146,169L1161,168L1175,172L1179,169L1182,157L1181,151Z","shape":"traced","area":16989,"i":16},{"id":"gulkala","name":"Gulkala","sub":"Gulkala Country","img":"Gulkala.jpeg","thumb":"assets/thumbs/gulkala.webp","body":"Australian and New zealand country.","type":"nation","color":"#686868","x":1201.2,"y":466.8,"d":"M1222,554L1222,561L1228,561L1229,554ZM1237,421L1237,428L1243,428L1243,421ZM1258,422L1252,422L1249,439L1244,447L1239,447L1226,437L1226,422L1215,421L1207,424L1201,435L1188,432L1181,437L1179,442L1173,443L1170,450L1163,457L1142,463L1134,468L1130,484L1131,513L1127,519L1127,525L1136,525L1146,520L1158,520L1166,514L1180,510L1192,510L1198,512L1202,520L1211,521L1212,528L1215,529L1215,539L1237,541L1247,538L1275,508L1282,491L1282,479L1278,474L1278,468L1274,467L1273,458L1266,450L1265,434L1259,430ZM1179,395L1179,401L1186,401L1186,395ZM1145,390L1145,397L1161,398L1161,390ZM1155,323L1154,331L1163,338L1169,338L1169,325L1167,323Z","shape":"traced","area":12657,"i":20},{"id":"samarkand","name":"Samarkand","sub":"United Middle Asia","img":"Samarkand.jpeg","thumb":"assets/thumbs/samarkand.webp","body":"A unified Central Asian state, heir to the Silk Road empires, neutral by policy, and built on natural gas, cotton, livestock, and cross-continental rail trade.","type":"nation","color":"#a379d2","x":950.8,"y":155.6,"d":"M1038,229L1038,217L1032,205L1032,197L1042,181L1045,164L1036,150L1024,146L1013,135L1009,134L1004,123L944,125L938,128L926,129L900,146L884,146L882,149L876,149L879,159L874,163L874,169L881,175L884,187L889,191L890,197L907,200L934,197L949,208L966,209L973,206L982,195L988,195L1007,201L1020,219L1032,228Z","shape":"traced","area":11446,"i":17},{"id":"hausa","name":"Hausa","sub":"Hausa Federation","img":"hausa.jpeg","thumb":"assets/thumbs/hausa.webp","body":"A sprawling sub-Saharan federation from the Atlantic to Madagascar, young and resource-rich (oil, cobalt, rare earths), known for pragmatic diplomacy and strong national identity.","type":"nation","color":"#bd7d28","x":779.0,"y":440.4,"d":"M844,378L814,378L802,383L792,383L774,397L755,397L740,405L741,422L733,438L733,447L742,465L746,489L754,502L759,521L763,523L790,518L804,505L812,492L813,483L823,476L822,457L832,447L841,442L846,433L845,416L841,408L840,396Z","shape":"traced","area":11279,"i":21},{"id":"bharat","name":"Bharat","sub":"Bharat Country","img":"Mithrakelling.jpeg","thumb":"assets/thumbs/mithrakelling.webp","body":"The country where the bharat people reside.","type":"nation","color":"#c3c853","x":987.2,"y":242.2,"d":"M907,204L907,207L914,213L926,215L940,228L944,250L958,262L959,267L964,272L974,272L974,282L994,328L999,325L1003,318L1003,297L1013,288L1014,277L1019,272L1045,266L1059,282L1062,292L1065,293L1071,289L1073,280L1068,271L1050,251L1043,250L1037,245L1036,235L1017,221L1004,204L983,199L978,207L965,213L948,212L931,200L918,204Z","shape":"traced","area":8105,"note":"The original map uses the Mithrakeling image for Bharat as well.","i":3},{"id":"adiwerna","name":"Adiwerna","sub":"Adiwerna Sultanate","img":"Adiwerna.jpeg","thumb":"assets/thumbs/adiwerna.webp","body":"A young Javanese-diaspora sultanate in northern South America, known for its crude oil wealth, family-oriented welfare policies, and the calm, blended architecture of its capital, Kulonprojo.","type":"nation","color":"#15b100","x":407.7,"y":341.3,"d":"M361,393L370,404L377,404L389,398L397,389L408,388L416,380L421,380L433,386L457,380L458,374L464,369L477,370L481,359L477,349L472,344L454,340L436,323L431,321L419,322L408,317L398,319L396,316L385,320L380,328L372,328L376,338L376,351L362,371Z","shape":"traced","area":6509,"i":8},{"id":"onderland","name":"Onderland","sub":"Onderland Republic","img":"Onderland.jpeg","thumb":"assets/thumbs/onderland.webp","body":"Arctic republic leading in cryo-technology.","type":"special","color":"#4f7fd6","x":547.5,"y":88.1,"d":"M662,20L660,17L651,19L646,18L645,15L630,12L596,14L566,19L555,19L545,15L538,21L537,25L514,31L518,35L537,34L543,39L544,47L542,56L539,59L540,65L535,71L537,86L542,92L544,87L552,81L565,84L575,74L583,74L599,65L615,63L632,56L633,47L644,42L644,33L647,32L647,26Z","shape":"traced","area":6053,"i":5},{"id":"nusantara","name":"Nusantara","sub":"Nusantara Federation","img":"nusantara.jpeg","thumb":"assets/thumbs/nusantara.webp","body":"A vast Austronesian-Melanesian archipelago of nearly a billion people, diverse in ethnicity and language, with a large, resource-rich economy and growing manufacturing sector.","type":"nation","color":"#98130b","x":1135.7,"y":356.0,"d":"M1128,400L1131,404L1143,404L1133,398ZM1166,371L1163,378L1165,390L1167,391L1168,384L1172,384L1177,389L1178,386L1174,378L1174,374L1177,372ZM1155,337L1131,360L1124,361L1124,370L1129,380L1144,381L1146,384L1151,383L1152,375L1160,362L1157,348L1161,344ZM1188,325L1183,330L1177,330L1182,332L1186,339L1190,333ZM1080,324L1080,330L1089,341L1091,354L1086,355L1076,344L1069,344L1082,359L1093,381L1102,390L1109,392L1109,383L1112,379L1110,375L1106,375L1101,370L1101,364L1104,361L1099,352L1099,344L1087,334L1084,326ZM1165,284L1163,299L1177,307L1176,304L1168,302L1170,289Z","shape":"traced","area":2578,"i":0},{"id":"champa","name":"Champa","sub":"Champa Empire","img":"champa.jpeg","thumb":"assets/thumbs/champa.webp","body":"A disciplined maritime empire in Southeast Asia, forged from a blend of Cham and Dai Viet peoples, driven by military industries, shipbuilding, and resource processing.","type":"nation","color":"#2c0c0e","x":1097.1,"y":293.6,"d":"M1086,256L1079,273L1075,276L1074,297L1079,309L1080,323L1084,309L1092,309L1101,320L1105,321L1106,326L1118,316L1121,310L1117,297L1104,283L1104,276L1107,271L1116,268L1111,261Z","shape":"traced","area":2123,"i":22},{"id":"kamchatka","name":"Kamchatka","sub":"Kamchatka Country","img":"Kamchatka.jpeg","thumb":"assets/thumbs/kamchatka.webp","body":"A cold-tech pioneer at the far edge of the continent, born from Aztec refugees and native alliances, now a global leader in advanced computing and data centres.","type":"nation","color":"#fdd000","x":1217.2,"y":70.5,"d":"M1218,64L1206,80L1207,87L1214,91L1212,105L1209,109L1211,114L1232,132L1232,118L1229,112L1219,105L1218,98L1238,94L1247,86L1239,79L1241,73L1262,77L1264,74Z","shape":"traced","area":1483,"i":13},{"id":"korea","name":"Korea","sub":"Unified Korea","img":"Korea.jpeg","thumb":"assets/thumbs/korea.webp","body":"Korea that has been unified.","type":"nation","color":"#3d6680","x":1145.9,"y":171.0,"d":"M1217,171L1199,163L1202,172L1196,173L1191,164L1186,172L1174,183L1175,196L1170,196L1162,189L1167,173L1164,171L1144,172L1137,178L1137,181L1140,183L1141,190L1145,186L1153,187L1155,194L1163,197L1167,210L1176,206L1176,199L1180,199L1183,203L1193,199L1197,195L1198,180L1203,179L1205,174L1212,175Z","shape":"traced","area":1342,"i":15},{"id":"jepang","name":"Jepang","sub":"UDverse Jepang","img":"Jepang.jpeg","thumb":"assets/thumbs/jepang.webp","body":"An old empire that still holds.","type":"nation","color":"#0f6c9d","x":1204.1,"y":192.3,"d":"M1210,183L1206,183L1209,189L1208,197L1199,206L1190,207L1184,214L1188,223L1191,216L1217,206L1214,188ZM1201,175L1211,174L1215,170L1202,165Z","shape":"traced","area":547,"i":14},{"id":"mithrakeling","name":"Mithrakeling","sub":"Bharat Special Region","img":"Mithrakelling.jpeg","thumb":"assets/thumbs/mithrakelling.webp","body":"Created to compete with basantara countries.","type":"special","color":"#3498db","x":1016.3,"y":276.7,"shape":"zone","r":16,"area":0,"i":1},{"id":"tembagapura","name":"Tembagapura","sub":"Champa Colonized Territory","img":"tembagapura.jpeg","thumb":"assets/thumbs/tembagapura.webp","body":"Country that was colonized by Champa.","type":"special","color":"#2c0c0e","x":809.5,"y":203.3,"shape":"zone","r":16,"area":0,"i":2},{"id":"cisange","name":"Cisange","sub":"Special Administrative Region","img":"Neo Jayantara.jpeg","thumb":"assets/thumbs/neo-jayantara.webp","body":"The Special Administrative Region that connects this world with multiverse. It's the richest in economy and the most modern in this world. It's a different territory from Nusantara.","type":"special","color":"#3498db","x":1116.8,"y":389.0,"shape":"zone","r":16,"area":0,"i":4},{"id":"kotabentala","name":"Kotabentala","sub":"Kotabentala Country","img":"Koben.jpeg","thumb":"assets/thumbs/koben.webp","body":"A small but immensely wealthy energy superpower built on the world’s finest refined oil, known for its homogeneous Sumbawa-Bugis society and state-owned Hyperenergy. It's a different territory from Nusantara.","type":"special","color":"#05154a","x":1154.6,"y":400.0,"shape":"zone","r":16,"area":0,"i":6},{"id":"conflict-area-4","name":"Conflict Area 4","sub":"Non Sovereign Nation","img":"conflict.png","thumb":"assets/thumbs/conflict.webp","body":"Area where conflict is happening all the time.","type":"conflict","color":"#95a5a6","x":580.9,"y":31.6,"shape":"zone","r":26,"area":0,"i":12},{"id":"taiwan-frontline","name":"Taiwan Frontline","sub":"Taiwan War Area","img":"taiwan.jpeg","thumb":"assets/thumbs/taiwan.webp","body":"Proxy battle between Nusantara and Champa","type":"front","color":"#95a5a6","x":1154.5,"y":253.2,"shape":"zone","r":11,"area":0,"i":23},{"id":"rotterdam-frontline","name":"Rotterdam Frontline","sub":"Europe War Area","img":"Rotterdam.jpeg","thumb":"assets/thumbs/rotterdam.webp","body":"Proxy battle between Nusantara and Champa","type":"front","color":"#95a5a6","x":694.5,"y":132.1,"shape":"zone","r":11,"area":0,"note":"This description is identical to the Taiwan Frontline entry in the original map and may be a placeholder.","i":24},{"id":"london-frontline","name":"London Frontline","sub":"Europe War Area","img":"london.jpeg","thumb":"assets/thumbs/london.webp","body":"Proxy battle between Nusantara and Champa","type":"front","color":"#95a5a6","x":684.3,"y":127.7,"shape":"zone","r":11,"area":0,"note":"This description is identical to the Taiwan Frontline entry in the original map and may be a placeholder.","i":25},{"id":"moskva-frontline","name":"Moskva Frontline","sub":"Europe War Area","img":"moskva.jpeg","thumb":"assets/thumbs/moskva.webp","body":"Proxy battle between Nusantara and Champa","type":"front","color":"#95a5a6","x":805.2,"y":111.6,"shape":"zone","r":11,"area":0,"note":"This description is identical to the Taiwan Frontline entry in the original map and may be a placeholder.","i":26}].sort((a,b)=>a.i-b.i);
+const TYPES={nation:{label:'Nations',one:'Nation'},special:{label:'Special regions',one:'Special region'},conflict:{label:'Conflict areas',one:'Conflict area (non-sovereign)'},front:{label:'Frontlines',one:'Frontline / war area'}};
+const NS='http://www.w3.org/2000/svg',W=1456,H=734;
+const $=id=>document.getElementById(id);
+const stage=$('stage'),svg=$('map'),vp=$('vp'),gR=$('regions'),gL=$('labels'),panel=$('panel'),tip=$('tip');
+const shown={nation:true,special:true,conflict:true,front:true};
+let sel=null,view={s:1,x:0,y:0};
+const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+// draw order: big traced areas first, then zones, then fronts on top
+const rank=e=>e.shape==='traced'?0:e.type==='front'?2:1;const order=[...DATA].sort((a,b)=>rank(a)-rank(b)||b.area-a.area);
+order.forEach(e=>{
+ let el;
+ if(e.shape==='traced'){el=document.createElementNS(NS,'path');el.setAttribute('d',e.d);el.setAttribute('fill-rule','evenodd')}
+ else{el=document.createElementNS(NS,'circle');el.setAttribute('cx',e.x);el.setAttribute('cy',e.y);el.setAttribute('r',e.r)}
+ el.classList.add('region');if(e.shape==='zone')el.classList.add(e.type==='front'?'front':'zone');
+ el.setAttribute('fill',e.color);el.setAttribute('stroke',e.type==='front'?'#ff7a6b':e.color);
+ el.setAttribute('tabindex','0');el.setAttribute('role','button');
+ el.setAttribute('aria-label',`${e.name}, ${TYPES[e.type].one}${e.shape==='zone'?', approximate area':''}`);
+ el.dataset.id=e.id;e.el=el;gR.appendChild(el);
+ const t=document.createElementNS(NS,'text');t.setAttribute('x',e.x);t.setAttribute('y',e.type==='front'||e.shape==='zone'?e.y-e.r-3:e.y);t.classList.add('lbl');t.textContent=e.name.replace(' Frontline','');e.lbl=t;gL.appendChild(t);
+ el.addEventListener('pointerenter',ev=>{if(ev.pointerType==='mouse')showTip(e,ev)});
+ el.addEventListener('pointermove',ev=>{if(ev.pointerType==='mouse')showTip(e,ev)});
+ el.addEventListener('pointerleave',hideTip);
+ el.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();select(e,true)}});
+ el.addEventListener('focus',()=>{if(!stage.matches(':active'))ensureVisible(e)});
+});
+$('mapimg').addEventListener('load',()=>$('loading').remove());
+$('mapimg').addEventListener('error',()=>{const i=$('mapimg');if(!i.dataset.f){i.dataset.f=1;i.setAttribute('href','Gemini_Generated_Image_txuy34txuy34txuy_waifu2x_art_scan_noise3_scale.png')}else $('loading').textContent='Map image failed to load.'});
+setTimeout(()=>{const l=$('loading');if(l)l.remove()},6000);
+function showTip(e,ev){const r=stage.getBoundingClientRect();tip.innerHTML=`<b>${esc(e.name)}</b><span>${esc(e.sub)}</span>`;tip.style.display='block';let x=ev.clientX-r.left,y=ev.clientY-r.top;x=Math.max(80,Math.min(r.width-80,x));if(y<60)y+=70;tip.style.left=x+'px';tip.style.top=y+'px'}
+function hideTip(){tip.style.display='none'}
+// legend
+Object.entries(TYPES).forEach(([k,v])=>{const b=document.createElement('button');b.className='chip';b.setAttribute('aria-pressed','true');
+ const c=k==='nation'?'#c3c853':k==='special'?'#3498db':k==='conflict'?'#95a5a6':'#ff7a6b';
+ b.innerHTML=`<span class="sw ${k==='special'?'zone':''}" style="background:${c};border-color:${c}"></span>${v.label} <span aria-hidden="true">(${DATA.filter(d=>d.type===k).length})</span>`;
+ b.onclick=()=>{shown[k]=!shown[k];b.setAttribute('aria-pressed',shown[k]);applyFilter()};$('legend').appendChild(b)});
+function applyFilter(){DATA.forEach(e=>{const on=shown[e.type];e.el.classList.toggle('dim',!on);e.lbl.classList.toggle('dim',!on);on?e.el.setAttribute('tabindex','0'):e.el.setAttribute('tabindex','-1')});if(sel&&!shown[sel.type])clearSel()}
+// panel
+function intro(){const grp=Object.keys(TYPES).map(k=>`<h3 style="font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--gold);margin:14px 0 2px">${TYPES[k].label}</h3><ul class="list">${DATA.filter(d=>d.type===k).map(d=>`<li><button data-go="${d.id}"><span class="sw" style="background:${d.color}"></span>${esc(d.name)}</button></li>`).join('')}</ul>`).join('');
+ panel.innerHTML=`<div class="intro"><h2>UDverse World</h2>Select a region on the map, search above, or pick from the list. Solid outlines are traced from the coloured areas of the map; dashed circles mark approximate locations only.${grp}</div>`;
+ panel.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>select(byId(b.dataset.go),true))}
+const byId=id=>DATA.find(d=>d.id===id);
+function select(e,focusMap){if(!e)return;if(!shown[e.type]){shown[e.type]=true;$('legend').children[Object.keys(TYPES).indexOf(e.type)].setAttribute('aria-pressed','true');applyFilter()}
+ if(sel)sel.el.classList.remove('sel');sel=e;e.el.classList.add('sel');svg.classList.add('mapdim');
+ const vis=DATA.filter(d=>shown[d.type]),i=vis.indexOf(e);
+ const ap=e.shape==='zone'?`<div class="approx">Approximate area: the original map marks this place with a point only, so this circle shows its location, not an official border.</div>`:(e.type==='conflict'?`<div class="approx">Outline traced from the striped (non-sovereign) area of the map around this marker; edges are approximate.</div>`:`<div class="approx">Outline traced from this faction's colour on the map; small islands and edges are approximate.</div>`);
+ panel.innerHTML=`<div class="ph"><div><h2 id="pt" tabindex="-1">${esc(e.name)}</h2><div class="sub">${esc(e.sub)}</div></div><button class="close" id="pclose" aria-label="Close details">&times;</button></div>
+ <span class="badge">${TYPES[e.type].one}</span>
+ <img class="pimg" src="${esc(e.thumb)}" alt="Illustration of ${esc(e.name)}" loading="lazy" decoding="async" data-orig="${esc(e.img)}">
+ <div class="pbody">${esc(e.body)}</div>${e.note?`<div class="note">Note: ${esc(e.note)}</div>`:''}${ap}
+ <div class="pnav"><button id="pprev">&larr; Previous</button><button id="pall">All places</button><button id="pnext">Next &rarr;</button></div>`;
+ const im=panel.querySelector('.pimg');im.onerror=()=>{if(!im.dataset.f){im.dataset.f=1;im.src=im.dataset.orig}else im.remove()};
+ $('pclose').onclick=()=>{clearSel();e.el.focus()};
+ $('pprev').onclick=()=>select(vis[(i-1+vis.length)%vis.length],true);
+ $('pnext').onclick=()=>select(vis[(i+1)%vis.length],true);
+ $('pall').onclick=()=>{clearSel()};
+ panel.classList.add('open');panel.scrollTop=0;$('live').textContent=`${e.name} selected`;
+ if(focusMap)flyTo(e)}
+function clearSel(){if(sel)sel.el.classList.remove('sel');sel=null;svg.classList.remove('mapdim');intro();panel.classList.remove('open')}
+// view transform (viewBox = stage pixels; map drawn at base*s)
+let cw=1,ch=1,base=1,minS=1;
+function isPhone(){return matchMedia('(max-width:820px)').matches}
+function fit(){const r=stage.getBoundingClientRect();cw=Math.max(1,r.width);ch=Math.max(1,r.height);svg.setAttribute('viewBox',`0 0 ${cw} ${ch}`);
+ const contain=Math.min(cw/W,ch/H);base=(ch>cw*0.9)?ch/H*0.92:contain;minS=Math.min(1,contain/base);apply()}
+function k(){return base*view.s}
+function apply(){const K=k(),mw=W*K,mh=H*K;
+ view.x=mw<=cw?(cw-mw)/2:Math.min(0,Math.max(cw-mw,view.x));view.y=mh<=ch?(ch-mh)/2:Math.min(0,Math.max(ch-mh,view.y));
+ vp.setAttribute('transform',`translate(${view.x.toFixed(2)} ${view.y.toFixed(2)}) scale(${K.toFixed(4)})`);
+ const fs=(11/Math.pow(K,0.8)).toFixed(2)+'px';gL.querySelectorAll('text').forEach(t=>t.style.fontSize=fs)}
+function svgPt(cx,cy){const r=svg.getBoundingClientRect();return{x:cx-r.left,y:cy-r.top}}
+function zoomAt(f,px,py){const ns=Math.max(minS,Math.min(10,view.s*f)),r=ns/view.s;view.x=px-(px-view.x)*r;view.y=py-(py-view.y)*r;view.s=ns;apply()}
+function sheetH(){return isPhone()&&panel.classList.contains('open')?panel.getBoundingClientRect().height:0}
+function center(){return{x:cw/2,y:(ch-sheetH())/2}}
+function bbox(e){if(e.shape==='zone')return{x:e.x-e.r*3,y:e.y-e.r*3,width:e.r*6,height:e.r*6};return e.el.getBBox()}
+function flyTo(e){const b=bbox(e),c=center(),availH=ch-sheetH();const K=Math.min(cw/b.width,availH/b.height)*0.6;view.s=Math.max(minS,Math.min(10,K/base));const KK=k();view.x=c.x-(b.x+b.width/2)*KK;view.y=c.y-(b.y+b.height/2)*KK;apply()}
+function ensureVisible(e){const b=bbox(e),KK=k(),cx=(b.x+b.width/2)*KK+view.x,cy=(b.y+b.height/2)*KK+view.y;if(cx<0||cx>cw||cy<0||cy>ch-sheetH()){const c=center();view.x=c.x-(b.x+b.width/2)*KK;view.y=c.y-(b.y+b.height/2)*KK;apply()}}
+function resetView(){view={s:1,x:0,y:0};const KK=k();view.x=(cw-W*KK)/2;view.y=(ch-H*KK)/2;apply()}
+new ResizeObserver(()=>{const c={x:cw/2,y:ch/2};fit()}).observe(stage);
+$('zin').onclick=()=>{const c=center();zoomAt(1.5,c.x,c.y)};$('zout').onclick=()=>{const c=center();zoomAt(1/1.5,c.x,c.y)};
+$('zreset').onclick=resetView;
+stage.addEventListener('wheel',ev=>{ev.preventDefault();const p=svgPt(ev.clientX,ev.clientY);zoomAt(ev.deltaY<0?1.2:1/1.2,p.x,p.y)},{passive:false});
+// pointer pan / pinch / tap
+const pts=new Map();let start=null,moved=false,pinch=null;
+stage.addEventListener('pointerdown',ev=>{if(ev.target.closest('.ctrls,.legend'))return;pts.set(ev.pointerId,{x:ev.clientX,y:ev.clientY});moved=false;
+ if(pts.size===1)start={x:ev.clientX,y:ev.clientY,vx:view.x,vy:view.y,t:ev.target};
+ if(pts.size===2){const [a,b]=[...pts.values()];pinch={d:Math.hypot(a.x-b.x,a.y-b.y),s:view.s,vx:view.x,vy:view.y,m:svgPt((a.x+b.x)/2,(a.y+b.y)/2)};moved=true}});
+stage.addEventListener('pointermove',ev=>{if(!pts.has(ev.pointerId))return;pts.set(ev.pointerId,{x:ev.clientX,y:ev.clientY});
+ if(pinch&&pts.size===2){const [a,b]=[...pts.values()];const d=Math.hypot(a.x-b.x,a.y-b.y);const ns=Math.max(minS,Math.min(10,pinch.s*d/pinch.d));const k=ns/pinch.s;view.s=ns;view.x=pinch.m.x-(pinch.m.x-pinch.vx)*k;view.y=pinch.m.y-(pinch.m.y-pinch.vy)*k;apply();return}
+ if(start&&pts.size===1){const dx=ev.clientX-start.x,dy=ev.clientY-start.y;if(!moved&&Math.hypot(dx,dy)>6){moved=true;stage.classList.add('drag');try{stage.setPointerCapture(ev.pointerId)}catch(_){}}
+  if(moved){view.x=start.vx+dx;view.y=start.vy+dy;apply();hideTip()}}});
+function up(ev){if(!pts.has(ev.pointerId))return;pts.delete(ev.pointerId);stage.classList.remove('drag');
+ if(pts.size===0){if(!moved&&start){const r=start.t.closest&&start.t.closest('.region');if(r)select(byId(r.dataset.id),false);else if(sel&&ev.pointerType!=='mouse'){}}
+  start=null;pinch=null}}
+stage.addEventListener('pointerup',up);stage.addEventListener('pointercancel',up);
+stage.addEventListener('keydown',ev=>{if(ev.target!==stage)return;const st=60;const K=ev.key;const c=center();
+ if(K==='+'||K==='='){zoomAt(1.3,c.x,c.y)}else if(K==='-'||K==='_'){zoomAt(1/1.3,c.x,c.y)}
+ else if(K==='0'){resetView()}
+ else if(K==='ArrowLeft'){view.x+=st;apply()}else if(K==='ArrowRight'){view.x-=st;apply()}
+ else if(K==='ArrowUp'){view.y+=st;apply()}else if(K==='ArrowDown'){view.y-=st;apply()}
+ else return;ev.preventDefault()});
+document.addEventListener('keydown',ev=>{if(ev.key==='Escape'){if($('results').classList.contains('open'))closeRes();else if(sel){const e=sel;clearSel();e.el.focus()}}});
+// search
+const q=$('q'),res=$('results');let hits=[],hi=-1;
+function closeRes(){res.classList.remove('open');q.parentElement.setAttribute('aria-expanded','false');hi=-1}
+function renderRes(){res.innerHTML=hits.map((d,i)=>`<li role="option" id="opt-${i}" aria-selected="${i===hi}" data-i="${i}"><span class="sw" style="background:${d.color}"></span>${esc(d.name)} <small style="color:var(--mute)">${esc(TYPES[d.type].one)}</small></li>`).join('')||'<li aria-disabled="true">No matches</li>';
+ res.classList.add('open');q.parentElement.setAttribute('aria-expanded','true');q.setAttribute('aria-activedescendant',hi>=0?'opt-'+hi:'')}
+q.addEventListener('input',()=>{const t=q.value.trim().toLowerCase();if(!t){closeRes();return}hits=DATA.filter(d=>(d.name+' '+d.sub+' '+d.body).toLowerCase().includes(t)).slice(0,12);hi=hits.length?0:-1;renderRes()});
+q.addEventListener('keydown',ev=>{if(!res.classList.contains('open'))return;if(ev.key==='ArrowDown'){hi=Math.min(hits.length-1,hi+1);renderRes();ev.preventDefault()}else if(ev.key==='ArrowUp'){hi=Math.max(0,hi-1);renderRes();ev.preventDefault()}else if(ev.key==='Enter'&&hits[hi]){pick(hits[hi]);ev.preventDefault()}});
+res.addEventListener('click',ev=>{const li=ev.target.closest('li[data-i]');if(li)pick(hits[+li.dataset.i])});
+function pick(d){closeRes();q.value='';select(d,true);d.el.focus({preventScroll:true})}
+document.addEventListener('pointerdown',ev=>{if(!ev.target.closest('.search'))closeRes()});
+// phone sheet: tap handle area toggles
+panel.addEventListener('click',ev=>{if(matchMedia('(max-width:820px)').matches&&!panel.classList.contains('open')){panel.classList.add('open')}});
+// deep link
+intro();fit();resetView();
+const h=decodeURIComponent(location.hash.slice(1));if(h&&byId(h))select(byId(h),true);
+window.addEventListener('hashchange',()=>{const d=byId(decodeURIComponent(location.hash.slice(1)));if(d)select(d,true)});
+</script>
 </body>
 </html>
